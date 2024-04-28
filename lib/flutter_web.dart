@@ -1,11 +1,6 @@
 library flutter_web;
 
-//referred:https://codeburst.io/how-to-use-javascript-libraries-in-your-dart-applications-e44668b8595d
 import 'package:js/js.dart';
-
-import 'dart:js';
-import 'package:intl/intl.dart';
-
 import 'package:js/js_util.dart';
 
 @JS('webengage.debug')
@@ -27,7 +22,7 @@ external void log(var a);
 
 /*
 Below are the modifications made from my side
-
+referred:https://codeburst.io/how-to-use-javascript-libraries-in-your-dart-applications-e44668b8595d
 */
 
 @JS('webengage.user.setAttribute')
@@ -61,8 +56,7 @@ class User {
       });
       return jsObject;
     } else if (value is DateTime) {
-      // log(DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZ').format(value)); //parsing dart date to JS date is yet to be done
-      // return jsDate('1714076284000');
+      //parsing dart date to JS date is yet to be done
     } else {
       // For other types (String, int, double, bool), return as-is
       return value;
@@ -78,49 +72,22 @@ class User {
 
 class WebEngage {
   var user = new User();
-  RegExp pattern = RegExp(
-      r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$|^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}Z)$'); //please ignore, added for testing date inputs
 
   /// Converts a Dart Map into a corresponding JavaScript object.
   dynamic mapToJsObject(Map map) {
     var object = newObject();
-
     map.forEach((key, value) {
       if (value is Map) {
         setProperty(object, key, mapToJsObject(value));
       } else if (value is List) {
         var jsArray = jsify(value);
         setProperty(object, key, jsArray);
-      } else if (pattern.hasMatch(value)) {
-        log("vale us" + value);
-        //var date1 = jsDate('1714076284000');
-
-        String dartDateString = "2021-04-25T20:18:04Z";
-        var a = jsDate(dartDateString);
-        setProperty(object, key, a);
-        // var formattedDate =
-        //     DateFormat('yyyy-MM-ddTHH:mm:ss.SSSZ').format(value);
-
-        // JsObject jsDate1 =
-        //     JsObject.jsify({'dateVal': value.toUtc().toIso8601String()});
-        // log(jsDate1);
-        // JsObject jsDateInstance = JsObject(context['Date'], [jsDate1]);
-        // setProperty(object, key, jsDateInstance);
-        // int millisecondsSinceEpoch = value.millisecondsSinceEpoch;
-        // JsFunction jsDateConstructor = context['Date'] as JsFunction;
-        // JsObject jsDate =
-        //     jsDateConstructor.apply([millisecondsSinceEpoch]) as JsObject;
-        // setProperty(object, key, jsDate);
-        // JsObject jsDate = JsObject.jsify(
-        //     {'millisecondsSinceEpoch': value.millisecondsSinceEpoch});
-        // JsObject jsDateInstance = JsObject(context['Date'], [jsDate]);
-        // setProperty(object, key, jsDateInstance);
-        //setProperty(object, key, jsNew<JsObject>('Date', value.toUtc().toIso8601String()));
+      } else if (value is DateTime) {
+        //Need to add the logic to parse DateTime to JS Date
       } else {
         setProperty(object, key, value);
       }
     });
-
     return object;
   }
 
