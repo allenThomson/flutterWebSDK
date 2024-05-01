@@ -31,8 +31,11 @@ external void _setAttribute(String attr, dynamic val);
 @JS('webengage.track')
 external void _track(String eventName, dynamic data);
 
-@JS('Date') // Define external JavaScript Date constructor
-external DateTime jsDate(String time);
+@JS('Date')
+class DateJS {
+  //referred: https://github.com/dart-lang/sdk/issues/25886
+  external factory DateJS(String dateString);
+}
 
 class User {
   void login(String cuid) => _login(cuid);
@@ -56,7 +59,8 @@ class User {
       });
       return jsObject;
     } else if (value is DateTime) {
-      //parsing dart date to JS date is yet to be done
+      var dateString = value.toString();
+      return DateJS(dateString);
     } else {
       // For other types (String, int, double, bool), return as-is
       return value;
@@ -83,7 +87,8 @@ class WebEngage {
         var jsArray = jsify(value);
         setProperty(object, key, jsArray);
       } else if (value is DateTime) {
-        //Need to add the logic to parse DateTime to JS Date
+        var dateString = value.toString();
+        setProperty(object, key, DateJS(dateString));
       } else {
         setProperty(object, key, value);
       }
